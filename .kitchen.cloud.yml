@@ -3,22 +3,22 @@ driver_config:
   google_client_email: <%= ENV['GOOGLE_CLIENT_EMAIL'] %>
   google_key_location: <%= ENV['GOOGLE_KEY_LOCATION'] %>
   google_project: <%= ENV['GOOGLE_PROJECT'] %>
-  aws_access_key_id: <%= ENV['AWS_ACCESS_KEY_ID'] %>
-  aws_secret_access_key: <%= ENV['AWS_SECRET_ACCESS_KEY'] %>
-  aws_ssh_key_id: <%= ENV['AWS_KEYPAIR_NAME'] %>
-  security_group_ids: [ 'sg-c823c0fb' ]
+  # aws_access_key_id: <%= ENV['AWS_ACCESS_KEY_ID'] %>
+  # aws_secret_access_key: <%= ENV['AWS_SECRET_ACCESS_KEY'] %>
+  # aws_ssh_key_id: <%= ENV['AWS_KEYPAIR_NAME'] %>
+  # security_group_ids: [ 'sg-c823c0fb' ]
 
   # This is required for AWS, but should not be specified if using GCE.
   # All other fields can coexist peacefully.
-  ssh_key: <%= ENV['AWS_SSH_KEY_PATH'] %>
+  # ssh_key: <%= ENV['AWS_SSH_KEY_PATH'] %>
 
 provisioner:
   name: chef_zero
 
 platforms:
   - name: centos-6.5
-    driver_plugin: ec2
-    # driver_plugin: gce
+    # driver_plugin: ec2
+    driver_plugin: gce
     driver_config:
       # AWS
       image_id: 'ami-b6bdde86'
@@ -31,6 +31,73 @@ platforms:
       public_key_path: <%= ENV['GCE_PUBLIC_KEY_PATH'] %>
 
 suites:
+  - name: author-6.0.0-oraclejdk7
+    driver_config:
+      machine_type: 'n1-standard-1'
+      flavor_id: 'm3.medium'
+    run_list:
+      - recipe[aem::author]
+    attributes:
+      aem:
+        version: '6.0.0'
+        download_url: <%= ENV['AEM_DOWNLOAD_URL_600'] %>
+        license_url: <%= ENV['AEM_LICENSE_URL_600'] %>
+        author:
+          startup:
+            max_attempts: 40
+            wait_between_attempts: 30
+      java:
+        install_flavor: 'oracle'
+        jdk_version: '7'
+        oracle:
+          accept_oracle_download_terms: true
+  - name: publish-6.0.0-oraclejdk7
+    driver_config:
+      machine_type: 'n1-standard-1'
+      flavor_id: 'm3.medium'
+    run_list:
+      - recipe[aem::publish]
+    attributes:
+      aem:
+        version: '6.0.0'
+        download_url: <%= ENV['AEM_DOWNLOAD_URL_600'] %>
+        license_url: <%= ENV['AEM_LICENSE_URL_600'] %>
+        publish:
+          startup:
+            max_attempts: 40
+            wait_between_attempts: 30
+      java:
+        install_flavor: 'oracle'
+        jdk_version: '7'
+        oracle:
+          accept_oracle_download_terms: true
+  - name: author-publish-6.0.0-oraclejdk7
+    driver_config:
+      machine_type: 'n1-standard-2'
+      flavor_id: 'm3.large'
+    run_list:
+      - recipe[aem::author]
+      - recipe[aem::publish]
+    attributes:
+      aem:
+        version: '6.0.0'
+        download_url: <%= ENV['AEM_DOWNLOAD_URL_600'] %>
+        license_url: <%= ENV['AEM_LICENSE_URL_600'] %>
+        author:
+          startup:
+            max_attempts: 40
+            wait_between_attempts: 30
+        publish:
+          startup:
+            max_attempts: 40
+            wait_between_attempts: 30
+      java:
+        install_flavor: 'oracle'
+        jdk_version: '7'
+        oracle:
+          accept_oracle_download_terms: true
+
+
   - name: author-5.6.1-oraclejdk7
     driver_config:
       machine_type: 'n1-standard-1'
@@ -39,7 +106,6 @@ suites:
       - recipe[aem::author]
     attributes:
       aem:
-        # TODO: can we get rid of the need for the version variable, and infer that from the URL instead?
         version: '5.6.1'
         download_url: <%= ENV['AEM_DOWNLOAD_URL_561'] %>
         license_url: <%= ENV['AEM_LICENSE_URL_561'] %>
@@ -60,7 +126,6 @@ suites:
       - recipe[aem::publish]
     attributes:
       aem:
-        # TODO: can we get rid of the need for the version variable, and infer that from the URL instead?
         version: '5.6.1'
         download_url: <%= ENV['AEM_DOWNLOAD_URL_561'] %>
         license_url: <%= ENV['AEM_LICENSE_URL_561'] %>
@@ -82,7 +147,6 @@ suites:
       - recipe[aem::publish]
     attributes:
       aem:
-        # TODO: can we get rid of the need for the version variable, and infer that from the URL instead?
         version: '5.6.1'
         download_url: <%= ENV['AEM_DOWNLOAD_URL_561'] %>
         license_url: <%= ENV['AEM_LICENSE_URL_561'] %>
@@ -109,7 +173,6 @@ suites:
       - recipe[aem::author]
     attributes:
       aem:
-        # TODO: can we get rid of the need for the version variable, and infer that from the URL instead?
         version: '5.6.0'
         download_url: <%= ENV['AEM_DOWNLOAD_URL_560'] %>
         license_url: <%= ENV['AEM_LICENSE_URL_560'] %>
@@ -130,7 +193,6 @@ suites:
       - recipe[aem::publish]
     attributes:
       aem:
-        # TODO: can we get rid of the need for the version variable, and infer that from the URL instead?
         version: '5.6.0'
         download_url: <%= ENV['AEM_DOWNLOAD_URL_560'] %>
         license_url: <%= ENV['AEM_LICENSE_URL_560'] %>
@@ -152,7 +214,6 @@ suites:
       - recipe[aem::publish]
     attributes:
       aem:
-        # TODO: can we get rid of the need for the version variable, and infer that from the URL instead?
         version: '5.6.0'
         download_url: <%= ENV['AEM_DOWNLOAD_URL_560'] %>
         license_url: <%= ENV['AEM_LICENSE_URL_560'] %>
@@ -179,7 +240,6 @@ suites:
       - recipe[aem::author]
     attributes:
       aem:
-        # TODO: can we get rid of the need for the version variable, and infer that from the URL instead?
         version: '5.5.0'
         download_url: <%= ENV['AEM_DOWNLOAD_URL_550'] %>
         license_url: <%= ENV['AEM_LICENSE_URL_550'] %>
@@ -200,7 +260,6 @@ suites:
       - recipe[aem::publish]
     attributes:
       aem:
-        # TODO: can we get rid of the need for the version variable, and infer that from the URL instead?
         version: '5.5.0'
         download_url: <%= ENV['AEM_DOWNLOAD_URL_550'] %>
         license_url: <%= ENV['AEM_LICENSE_URL_550'] %>
@@ -222,7 +281,6 @@ suites:
       - recipe[aem::publish]
     attributes:
       aem:
-        # TODO: can we get rid of the need for the version variable, and infer that from the URL instead?
         version: '5.5.0'
         download_url: <%= ENV['AEM_DOWNLOAD_URL_550'] %>
         license_url: <%= ENV['AEM_LICENSE_URL_550'] %>
@@ -244,9 +302,7 @@ suites:
   - name: dispatcher
     driver_config:
       machine_type: 'f1-micro'
-      # machine_type: 'g1-small'
       flavor_id: 't1.micro'
-      # flavor_id: 'm1.small'
     run_list:
       - recipe[aem::dispatcher]
     attributes:
